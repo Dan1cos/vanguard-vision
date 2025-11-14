@@ -1,5 +1,7 @@
 from ultralytics import YOLO
-from baseModel import BaseModel
+
+from model.baseModel import BaseModel
+
 
 class YOLOModel(BaseModel):
     def __init__(self, weights_path: str):

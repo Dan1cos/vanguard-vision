@@ -3,14 +3,12 @@ from tkinter import Button, Label, filedialog
 
 from PIL import Image, ImageTk
 
+from backend.service import predict
+
 
 # Placeholder for your model inference method
 def model_inference(image_path):
-    # Here, replace this stub with actual model inference code
-    # For example, load the image and run your model
-    print(f"Model inference called on: {image_path}")
-    # Return dummy result for demonstration
-    return "Projectile type: Grenade\nConfidence: 87%"
+    return predict(image_path)
 
 
 class OrdnanceApp:
@@ -67,7 +65,9 @@ class OrdnanceApp:
 
     def run_recognition(self):
         if self.image_path:
-            result_text = model_inference(self.image_path)
+            result = model_inference(self.image_path)
+            confidence_scores = result[0].probs.top1conf
+            result_text = f"Result: {result[0].names[result[0].probs.top1]} {float(confidence_scores):.2f}"
             self.result_label.configure(text=result_text)
         else:
             self.result_label.configure(text="Please upload an image first.")
