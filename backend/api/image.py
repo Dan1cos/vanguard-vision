@@ -6,21 +6,38 @@ from fastapi.responses import JSONResponse
 from PIL import Image, UnidentifiedImageError
 
 from backend import service
+from backend.db.schemas import DetectionResult
 
 router = APIRouter(
     prefix="/api",
-    tags=["Upload Image"],
+    tags=["Image Detection"],
 )
 
 
-@router.post("/image")
-async def upload_image(file: UploadFile = File(...)):
-    """Accepts an uploaded image, saves it to a temporary file, and
-    forwards it to the prediction service
-
-    Returns a JSON response with the path where the file was saved and
-    prediction result when service.predict returns something meaningful
-    """
+@router.post(
+    "/image",
+    response_model=DetectionResult,
+    summary="Detect objects in uploaded image",
+    response_description="Detection results with confidence scores",
+    responses={
+        200: {
+            "description": "Successful detection",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "top_conf": 0.95,
+                        "top_name": "aircraft-bombs"
+                    }
+                }
+            }
+        },
+        400: {"description": "Invalid image file or unsupported format"},
+        413: {"description": "File too large (max 2MB)"},
+        415: {"description": "Unsupported media type"},
+        500: {"description": "Prediction service error"}
+    }
+)
+async def upload_image(file: UploadFile = File(..., description="Image file to analyze (PNG, JPEG, WebP, HEIC/HEIF). Max size: 2MB")):
     if not file.content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="Uploaded file is not an image")
 

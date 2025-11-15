@@ -3,6 +3,8 @@ import logging
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
 
+from backend.db.schemas import HealthCheckResponse
+
 router = APIRouter(
     prefix="/api",
     tags=["Health"],
@@ -11,7 +13,15 @@ router = APIRouter(
 logger = logging.getLogger("healthcheck")
 
 
-@router.get("/health")
+@router.get(
+    "/health",
+    response_model=HealthCheckResponse,
+    summary="Health check endpoint",
+    responses={
+        200: {"description": "Service is healthy"},
+        503: {"description": "Service is unhealthy"}
+    }
+)
 async def health_check():
     try:
         result = {
