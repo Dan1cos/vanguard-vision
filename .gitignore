@@ -291,3 +291,7 @@ pyvenv.cfg
 .vscode
 .vscode/*
 .DS_Store
+
+database
+database/
+bin
