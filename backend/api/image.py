@@ -1,8 +1,9 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException, status
-from fastapi.responses import JSONResponse
-from PIL import Image, UnidentifiedImageError
 import io
 import os
+
+from fastapi import APIRouter, File, HTTPException, UploadFile, status
+from fastapi.responses import JSONResponse
+from PIL import Image, UnidentifiedImageError
 
 from backend import service
 
@@ -10,6 +11,7 @@ router = APIRouter(
     prefix="/api",
     tags=["Upload Image"],
 )
+
 
 @router.post("/image")
 async def upload_image(file: UploadFile = File(...)):
@@ -29,17 +31,22 @@ async def upload_image(file: UploadFile = File(...)):
         try:
             img = Image.open(io.BytesIO(content)).convert("RGB")
         except UnidentifiedImageError:
-            raise HTTPException(status_code=400, detail="Uploaded file is not a valid image")
+            raise HTTPException(
+                status_code=400, detail="Uploaded file is not a valid image"
+            )
 
         try:
             results = service.predict(img)
         except Exception as e:
-            return JSONResponse({"error": "prediction_failed", "detail": str(e)}, status_code=500)
+            return JSONResponse(
+                {"error": "prediction_failed", "detail": str(e)}, status_code=500
+            )
         top_conf = results[0].probs.top1conf
         top_name = results[0].names[results[0].probs.top1]
         return JSONResponse({"top_conf": float(top_conf), "top_name": str(top_name)})
     finally:
         await file.close()
+
 
 def validate_file_size_type(upload_file: UploadFile, max_bytes: int = 2 * 1024 * 1024):
     """Validate uploaded file-ish object for allowed mime/type and size
@@ -78,12 +85,17 @@ def validate_file_size_type(upload_file: UploadFile, max_bytes: int = 2 * 1024 *
             chunks.append(chunk)
             size += len(chunk)
             if size > max_bytes:
-                raise HTTPException(status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, detail="Too large")
+                raise HTTPException(
+                    status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                    detail="Too large",
+                )
         fobj.seek(0)
 
     if size > max_bytes:
         fobj.seek(0)
-        raise HTTPException(status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, detail="Too large")
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, detail="Too large"
+        )
 
     try:
         fobj.seek(0)
@@ -94,9 +106,14 @@ def validate_file_size_type(upload_file: UploadFile, max_bytes: int = 2 * 1024 *
                 pass
     except UnidentifiedImageError:
         fobj.seek(0)
-        raise HTTPException(status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, detail="Uploaded file is not a valid image")
+        raise HTTPException(
+            status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+            detail="Uploaded file is not a valid image",
+        )
     except Exception:
         fobj.seek(0)
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid image file")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid image file"
+        )
 
     fobj.seek(0)
