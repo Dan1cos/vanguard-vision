@@ -1,4 +1,6 @@
 import uuid
+from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -20,18 +22,18 @@ class ItemType(ItemTypeBase):
 
 
 class FoundItemBase(BaseModel):
-    lat: float
-    lon: float
+    lat: Optional[float] = None
+    lon: Optional[float] = None
     type_id: uuid.UUID
-    created_at: str
 
 
 class FoundItemCreate(FoundItemBase):
-    pass
+    created_at: Optional[datetime] = None
 
 
 class FoundItem(FoundItemBase):
     id: uuid.UUID
+    created_at: datetime
 
     class Config:
         orm_mode = True
@@ -40,25 +42,20 @@ class FoundItem(FoundItemBase):
 # API Response schemas for documentation
 class DetectionResult(BaseModel):
     """Response model for image detection endpoint"""
+
     top_conf: float
     top_name: str
 
     class Config:
         json_schema_extra = {
-            "example": {
-                "top_conf": 0.95,
-                "top_name": "aircraft-bombs"
-            }
+            "example": {"top_conf": 0.95, "top_name": "aircraft-bombs"}
         }
 
 
 class HealthCheckResponse(BaseModel):
     """Response model for health check endpoint"""
+
     status: str
 
     class Config:
-        json_schema_extra = {
-            "example": {
-                "status": "healthy"
-            }
-        }
+        json_schema_extra = {"example": {"status": "healthy"}}

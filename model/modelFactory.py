@@ -1,6 +1,7 @@
 from yoloModel import YOLOModel
 
-class ModelFactory():
+
+class ModelFactory:
     @staticmethod
     def create(model_type: str, **kwargs):
         if model_type == "yolo":

@@ -19,8 +19,8 @@ logger = logging.getLogger("healthcheck")
     summary="Health check endpoint",
     responses={
         200: {"description": "Service is healthy"},
-        503: {"description": "Service is unhealthy"}
-    }
+        503: {"description": "Service is unhealthy"},
+    },
 )
 async def health_check():
     try:

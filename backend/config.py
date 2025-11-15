@@ -15,6 +15,8 @@ class Settings(BaseSettings):
     DEBUG: bool = True
     LOG_LEVEL: str = "INFO"
 
+    MIN_PREDICTION_CONFIDENCE: float = 0.6
+
     class Config:
         env_file = ".env"
         case_sensitive = True

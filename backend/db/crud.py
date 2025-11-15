@@ -22,6 +22,10 @@ def get_item_type_by_title(db: Session, title: str):
     return db.query(tables.ItemType).filter(tables.ItemType.title == title).first()
 
 
+def get_item_type_by_id(db: Session, type_id: uuid.UUID):
+    return db.query(tables.ItemType).filter(tables.ItemType.id == type_id).first()
+
+
 # ---- FoundItem ----
 def create_found_item(db: Session, obj: schemas.FoundItemCreate):
     db_obj = tables.FoundItem(**obj.dict())

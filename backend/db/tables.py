@@ -31,7 +31,7 @@ class FoundItem(Base):
         default=uuid.uuid4,
         nullable=False,
     )
-    lat = Column(Float, nullable=False)
-    lon = Column(Float, nullable=False)
+    lat = Column(Float, nullable=True)
+    lon = Column(Float, nullable=True)
     type_id = Column(UUID(as_uuid=True), ForeignKey("item_type.id"), nullable=False)
     created_at = Column(sa.DateTime(), nullable=False, server_default=sa.func.now())
